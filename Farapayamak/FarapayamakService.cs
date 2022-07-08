@@ -14,39 +14,65 @@ namespace Farapayamak
             _httpClient = httpClientFactory.CreateClient(Constants.HttpClientName);
         }
 
-        public List<string> GetPhoneNumbers() =>
-            _options.Phones.Select(d => d.Number).ToList();
+        public List<string> GetPhoneNumbers() => new List<string>();
 
-
-        public async Task<(bool IsSuccess, string message)> SendSMSAsync(string toNumber, string message)
+        public async Task<(bool IsSuccess, string Message)> SendSMSAsync(string toNumber, string message)
         {
             if (string.IsNullOrEmpty(toNumber))
                 throw new ArgumentNullException(toNumber);
 
-            if (string.IsNullOrEmpty(toNumber))
+            if (string.IsNullOrEmpty(message))
                 throw new ArgumentNullException(message);
-             
+
             var requestModel = new SendMessageRequest
             {
-                from = _options.Phones.FirstOrDefault(n => n.IsDefault)?.Number ?? throw new ArgumentNullException("fromNumber"),
+                from = _options.DefaultNumber ?? throw new ArgumentNullException("fromNumber"),
                 isFlash = _options.UseDefaultIsFlash,
                 password = _options.Password,
                 username = _options.Username,
                 text = message,
                 to = toNumber
             };
-             
+
             var result = await SendPostRequest<SendMessageResponse>(Constants.Routes.SendMessageRoute, requestModel);
-             
-            return (result.IsSuccess,result.Message);
+
+            return (result.IsSuccess, result.Message);
         }
+
+        public async Task<(bool IsSuccess, string Message)> SendSMSAsync(string fromNumber ,string toNumber, string message)
+        {
+            if (string.IsNullOrEmpty(fromNumber))
+                throw new ArgumentNullException(fromNumber);
+
+            if (string.IsNullOrEmpty(toNumber))
+                throw new ArgumentNullException(toNumber);
+
+            if (string.IsNullOrEmpty(message))
+                throw new ArgumentNullException(message);
+
+            var requestModel = new SendMessageRequest
+            {
+                from = fromNumber,
+                isFlash = _options.UseDefaultIsFlash,
+                password = _options.Password,
+                username = _options.Username,
+                text = message,
+                to = toNumber
+            };
+
+            var result = await SendPostRequest<SendMessageResponse>(Constants.Routes.SendMessageRoute, requestModel);
+
+            return (result.IsSuccess, result.Message);
+        }
+
+
 
 
 
 
         #region Helpers
 
-        private async Task<TResponse?> SendPostRequest<TResponse>(string address, object requestModel) where TResponse : class
+        private async Task<TResponse> SendPostRequest<TResponse>(string address, object requestModel) where TResponse : class
         {
             try
             {
@@ -60,7 +86,7 @@ namespace Farapayamak
             }
             catch (Exception ex)
             {
-                return null;
+                return 
             }
         }
         #endregion

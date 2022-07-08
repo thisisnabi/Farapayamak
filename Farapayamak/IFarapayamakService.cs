@@ -8,7 +8,8 @@ namespace Farapayamak
 {
     public interface IFarapayamakService
     {
-        Task SendSMSAsync(string toNumber, string message);
+        Task<(bool IsSuccess,string Message)> SendSMSAsync(string toNumber, string message);
+        Task<(bool IsSuccess, string Message)> SendSMSAsync(string fromNumber,string toNumber, string message);
         List<string> GetPhoneNumbers();
     }
 }

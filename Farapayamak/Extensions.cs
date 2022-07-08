@@ -38,16 +38,14 @@ namespace Farapayamak
         public static StringContent ConvertToStringContent(this object dataObject)
         {
             var json = JsonSerializer.Serialize(dataObject);
-            return new StringContent(json, Encoding.UTF8);
+            return new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
         }
 
-        public static async Task<TModel?> ToJsonModelResponseAsync<TModel>(this HttpResponseMessage httpResponseMessage) where TModel : class
+        public static async Task<TModel> ToJsonModelResponseAsync<TModel>(this HttpResponseMessage httpResponseMessage) where TModel : class
         {
             var result = await httpResponseMessage.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<TModel>(result);
+            return JsonSerializer.Deserialize<TModel>(result) ?? null;
         }
-
-
-
+         
     }
 }
