@@ -1,7 +1,7 @@
 
 # Farapayamak
 
-Farapayamak is an Iranian SMS Provider, and this package is a helper service for easy use. So you can use it on .Net Core Projects and use DI with custom configuration.
+Farapayamak is an Iranian SMS provider and this package is an auxiliary service for its convenient use. So you can use it in .Net Core projects and use DI with custom configuration.
 
 
 > First, you must create base account on [farapayamak.ir](https://farapayamak.ir/)
@@ -35,7 +35,7 @@ Install with Package Manager Console
 // you must set configuration when add Service in 'Startup' Class
 public void ConfigureServices(IServiceCollection services)
 {
-    services.AddVerificoder(options => {
+    services.AddFarapayamakSMSProvider(options => {
          options.Username = "nilesoft.ir";
          options.Password = "lakejrf!#$RASF@";
          options.DefaultNumber = "500012701212122323"; // your number in Farapayamak Panel
