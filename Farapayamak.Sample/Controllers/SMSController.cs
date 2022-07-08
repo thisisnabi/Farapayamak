@@ -12,20 +12,8 @@ namespace Farapayamak.Sample.Controllers
         public SMSController(IFarapayamakService farapayamakService)
         {
             _farapayamakService = farapayamakService;
-
-             
         } 
-
-        public async Task<IActionResult> Get()
-        
-        
-        {
-            var bala = await _farapayamakService.GetUserNumbers();
  
-
-            return Ok();
-        }
-
   
     }
 }

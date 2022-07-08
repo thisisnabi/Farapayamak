@@ -4,6 +4,17 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Version>1.0.0.0</Version>
+    <Authors>Nabi Karampoor</Authors>
+    <Company>Nilesoft</Company>
+    <Description>Farapayamak is an Iranian SMS Provider, and this package is a helper service for easy use.</Description>
+    <PackageProjectUrl>https://thisisnabi.ir/packages/Farapayamak</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/thisisnabi/Farapayamak</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>SMS, SMS Provider, Helper</PackageTags>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
