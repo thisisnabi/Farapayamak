@@ -18,7 +18,7 @@ namespace Farapayamak
             _options.Phones.Select(d => d.Number).ToList();
 
 
-        public async Task SendSMSAsync(string toNumber, string message)
+        public async Task<(bool IsSuccess, string message)> SendSMSAsync(string toNumber, string message)
         {
             if (string.IsNullOrEmpty(toNumber))
                 throw new ArgumentNullException(toNumber);
@@ -37,6 +37,8 @@ namespace Farapayamak
             };
              
             var result = await SendPostRequest<SendMessageResponse>(Constants.Routes.SendMessageRoute, requestModel);
+             
+            return (result.IsSuccess,result.Message);
         }
 
 

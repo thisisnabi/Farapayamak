@@ -1,4 +1,6 @@
-﻿namespace Farapayamak
+﻿using System.Reflection;
+
+namespace Farapayamak
 {
     public static class Extensions
     {
@@ -21,7 +23,18 @@
 
             return services;
         }
-         
+
+        public static string ToPersian(this Enum val)
+        {
+            var fieldInfo = val.GetType().GetField(val.ToString());
+
+            if (fieldInfo is null)
+                return string.Empty;
+
+            var attributes = (PersianTitleAttribute[])fieldInfo.GetCustomAttributes(typeof(PersianTitleAttribute), false);
+            return attributes.Length > 0 ? attributes[0].Title : string.Empty;
+        } 
+
         public static StringContent ConvertToStringContent(this object dataObject)
         {
             var json = JsonSerializer.Serialize(dataObject);
@@ -33,5 +46,8 @@
             var result = await httpResponseMessage.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<TModel>(result);
         }
+
+
+
     }
 }
