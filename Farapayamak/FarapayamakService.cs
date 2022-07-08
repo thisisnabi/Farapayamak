@@ -13,12 +13,13 @@ public sealed class FarapayamakService : IFarapayamakService
         _httpClient = httpClientFactory.CreateClient(Constants.HttpClientName);
     }
 
+
     public List<string> GetPhoneNumbers() => new List<string>();
-     
-    public async Task<(bool IsSuccess, string Response)> SendSMSAsync(string toNumber, string message) 
-        =>  await SendSMSAsync(_options.DefaultNumber, toNumber, message);
-     
-    public async Task<(bool IsSuccess, string Response)> SendSMSAsync(string fromNumber, string toNumber, string message)
+
+    public async Task<(bool IsSuccess, string Response, long RecivedId)> SendSMSAsync(string toNumber, string message)
+        => await SendSMSAsync(_options.DefaultNumber, toNumber, message);
+
+    public async Task<(bool IsSuccess, string Response, long RecivedId)> SendSMSAsync(string fromNumber, string toNumber, string message)
     {
         if (string.IsNullOrEmpty(fromNumber))
             throw new ArgumentNullException(fromNumber);
@@ -43,13 +44,32 @@ public sealed class FarapayamakService : IFarapayamakService
 
         if (result != null)
         {
+            return (result.IsSuccess, result.Response, result.RecivedId);
+        }
+
+        return (false, Constants.Messages.AnUnknownErrorHasOccurred, -1);
+    }
+
+
+    public async Task<(bool IsSuccess, string Response)> GetMessageStatusAsync(long reciveId)
+    {
+
+        var requestModel = new GetDeliveriesRequest
+        {
+            password = _options.Password,
+            username = _options.Username,
+            RecId = reciveId
+        };
+
+        var result = await SendPostRequestAsync<GetDeliveriesResponse>(Constants.Routes.GetDeliveries, requestModel);
+
+        if (result != null)
+        {
             return (result.IsSuccess, result.Response);
         }
 
         return (false, Constants.Messages.AnUnknownErrorHasOccurred);
     }
-
-
 
 
 

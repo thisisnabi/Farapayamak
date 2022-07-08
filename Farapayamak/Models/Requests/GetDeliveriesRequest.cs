@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace Farapayamak.Models.Requests
 {
-    public class BaseRequest
+    public class GetDeliveriesRequest : BaseRequest
     {
-        public string username { get; set; }
-        public string password { get; set; }
-     
+        public long RecId { get; set; }
     }
 }
