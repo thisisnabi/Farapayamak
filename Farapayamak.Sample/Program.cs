@@ -9,8 +9,7 @@ builder.Services.AddFarapayamakSMSProvider(options => {
     options.UseDefaultIsFlash = false; // default false
     options.MaxReciveMessageCount = 100; // default 50
 });
-
-
+ 
 
 builder.Services.AddControllers();
 
