@@ -102,28 +102,42 @@ public async Task SendSingleMessage()
 ```
 
 
-## Send Range Message
+## Get/Inbox|Outbox Messages
 ```csharp
-public async Task SendRangeMessage()
+public async Task GetInboxOutBoxMessages()
+{ 
+      // use index 0, you can pass index
+      var inboxMessages = await _smsService.GetInboxMessagesAsync();
+          // Result
+          // inboxMessages.IsSuccess     (bool)
+          // inboxMessages.Response      (string) action message
+          // inboxMessages.Messages      (list of MessageItemModel)
+
+       // use index 0, you can pass index
+       var outboxMessages = await _smsService.GetOutboxMessagesAsync();
+           // Result
+           // outboxMessages.IsSuccess     (bool)
+           // outboxMessages.Response      (string) action message
+           // outboxMessages.Messages      (list of MessageItemModel)
+}
+```
+
+## Get/ Message Status
+```csharp
+public async Task GetMessageStatus()
 {
-       List<string> recivers = new() {
-           "09127706148",
-           "09120000000",
-           "12312313452"
-       };
-
-       // use defualt panel number
-       var sendResult = await _smsService.SendRangeAsync(recivers, "Hi dear [---]");
-             
-       // use custom panel number [xxx is your panel number]
-       var sendResult = await _smsService.SendRangeAsync("xxx", recivers, "Hi dear [---]");
-
-       // Result
-       // sendResult.IsSuccess     (bool)
-       // sendResult.Status        (list of records) List<(string number,string response,long recivedId)> 
-       // sendResult.Status.Item
-              // Item.IsSuccess     (bool)
-              // Item.Response      (string) action message
-              // Item.RecivedId     (long) if send was a failure, you get -1.
+      // use defualt panel number
+      var sendResult = await _smsService.SendAsync("09127706148", "Hi dear [thisisnabi]");
+          // Result
+          // sendResult.IsSuccess     (bool)
+          // sendResult.Response      (string) action message
+          // sendResult.RecivedId     (long) if send was a failure, you get -1.
+          
+      if (sendResult.IsSuccess)
+      {
+          var msgStatus = await _smsService.GetMessageStatusAsync(sendResult.RecivedId);
+             // msgStatus.IsSuccess     (bool)
+             // msgStatus.Response      (string) action message
+      }
 }
 ```
