@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 
 namespace Farapayamak
 {
-    public interface IFarapayamakService
+    public class FarapayamakException : Exception
     {
-        Task SendSMSAsync(string toNumber, string message);
-        List<string> GetPhoneNumbers();
     }
 }
