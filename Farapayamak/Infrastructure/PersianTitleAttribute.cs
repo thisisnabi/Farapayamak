@@ -1,4 +1,4 @@
-﻿namespace Farapayamak;
+﻿namespace Farapayamak.Infrastructure;
 
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
 public class PersianTitleAttribute : Attribute

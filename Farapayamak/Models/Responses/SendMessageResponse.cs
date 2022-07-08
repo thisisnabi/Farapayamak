@@ -9,7 +9,7 @@ namespace Farapayamak.Models.Responses
 {
     public class SendMessageResponse : BaseResponse
     {
-        public string Message => Value switch { 
+        public string Response => Value switch { 
             "0"  => SendMessageEnum.InvalidUsernameOrPassword.ToPersian(),
             "1" => SendMessageEnum.TheRequestWasMadeSuccessfully.ToPersian(),
             "2" => SendMessageEnum.NotEnoughCredit.ToPersian(),
