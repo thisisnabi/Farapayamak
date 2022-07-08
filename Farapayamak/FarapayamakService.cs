@@ -13,8 +13,6 @@ public sealed class FarapayamakService : IFarapayamakService
         _httpClient = httpClientFactory.CreateClient(Constants.HttpClientName);
     }
 
-    public List<string> GetPhoneNumbers() => new List<string>();
-
     public async Task<(bool IsSuccess, string Response, long RecivedId)> SendAsync(string toNumber, string message)
         => await SendAsync(_options.DefaultNumber, toNumber, message);
 
@@ -31,12 +29,12 @@ public sealed class FarapayamakService : IFarapayamakService
 
         var requestModel = new SendMessageRequest
         {
-            from = fromNumber,
-            isFlash = _options.UseDefaultIsFlash,
-            password = _options.Password,
             username = _options.Username,
+            password = _options.Password,
+            from = fromNumber,
             text = message,
-            to = toNumber
+            to = toNumber,
+            isFlash = _options.UseDefaultIsFlash
         };
 
         var result = await SendPostRequestAsync<SendMessageResponse>(Constants.Routes.SendMessage, requestModel);
@@ -50,8 +48,8 @@ public sealed class FarapayamakService : IFarapayamakService
     }
 
 
-    public async Task<(bool IsSuccess, List<(string number,string response,long RecivedId)>? Status)> SendRangeAsync(List<string> toNumber, string message)
-    => await SendRangeAsync(_options.DefaultNumber, toNumber, message);
+    public async Task<(bool IsSuccess, List<(string number, string response, long RecivedId)>? Status)> SendRangeAsync(List<string> toNumber, string message)
+         => await SendRangeAsync(_options.DefaultNumber, toNumber, message);
 
     public async Task<(bool IsSuccess, List<(string number, string response, long RecivedId)>? Status)> SendRangeAsync(string fromNumber, List<string> toNumber, string message)
     {
@@ -66,12 +64,12 @@ public sealed class FarapayamakService : IFarapayamakService
 
         var requestModel = new SendMessageRequest
         {
-            from = fromNumber,
-            isFlash = _options.UseDefaultIsFlash,
-            password = _options.Password,
             username = _options.Username,
+            password = _options.Password,
+            from = fromNumber,
             text = message,
-            to = string.Join(",",toNumber.ToArray())
+            to = string.Join(",", toNumber.ToArray()),
+            isFlash = _options.UseDefaultIsFlash
         };
 
         var result = await SendPostRequestAsync<SendRangeMessageResponse>(Constants.Routes.SendMessage, requestModel);
@@ -83,24 +81,22 @@ public sealed class FarapayamakService : IFarapayamakService
 
             for (int i = 0; i < resultRange.Count; i++)
             {
-                response.Add((toNumber[i],resultRange[i].Response, resultRange[i].RecivedId));
+                response.Add((toNumber[i], resultRange[i].Response, resultRange[i].RecivedId));
             }
-             
+
             return (result.IsSuccess, response);
         }
 
         return (false, null);
     }
 
-
-
     public async Task<(bool IsSuccess, string Response)> GetMessageStatusAsync(long reciveId)
     {
 
         var requestModel = new GetDeliveriesRequest
         {
-            password = _options.Password,
             username = _options.Username,
+            password = _options.Password,
             RecId = reciveId
         };
 
@@ -121,8 +117,8 @@ public sealed class FarapayamakService : IFarapayamakService
     {
         var requestModel = new GetMessageRequest
         {
-            password = _options.Password,
             username = _options.Username,
+            password = _options.Password,
             from = number,
             count = _options.MaxReciveMessageCount,
             index = index,
@@ -133,10 +129,11 @@ public sealed class FarapayamakService : IFarapayamakService
 
         if (result != null)
         {
-            return (result.MyBase.IsSuccess, result.MyBase.Response, result.Data.Select(m => new MessageItem { 
+            return (result.MyBase.IsSuccess, result.MyBase.Response, result.Data.Select(m => new MessageItem
+            {
                 Body = m.Body,
                 CurrentLocation = m.CurrentLocation,
-                FirstLocation  = m.FirstLocation,
+                FirstLocation = m.FirstLocation,
                 IsUnicode = m.IsUnicode,
                 MsgID = m.MsgID,
                 Parts = m.Parts,
@@ -159,8 +156,8 @@ public sealed class FarapayamakService : IFarapayamakService
     {
         var requestModel = new GetMessageRequest
         {
-            password = _options.Password,
             username = _options.Username,
+            password = _options.Password,
             from = number,
             count = _options.MaxReciveMessageCount,
             index = index,
@@ -191,11 +188,75 @@ public sealed class FarapayamakService : IFarapayamakService
         return (false, Constants.Messages.AnUnknownErrorHasOccurred, null);
     }
 
+
+
+    public async Task<(bool IsSuccess, decimal Credit)> GetCredit()
+    {
+        var requestModel = new GetCreditRequest
+        {
+            username = _options.Username,
+            password = _options.Password,
+        };
+
+        var result = await SendPostRequestAsync<GetCreditResponse>(Constants.Routes.GetCredit, requestModel);
+
+        if (result != null)
+        {
+            return (result.IsSuccess, decimal.TryParse(result.Response, out decimal val) ? val : 0);
+        }
+
+        return (false, 0);
+    }
+
+    public async Task<(bool IsSuccess, decimal BasePrice)> GetBasePrice()
+    {
+        var requestModel = new GetBasePriceRequest
+        {
+            username = _options.Username,
+            password = _options.Password,
+        };
+
+        var result = await SendPostRequestAsync<GetCreditResponse>(Constants.Routes.GetBasePrice, requestModel);
+
+        if (result != null)
+        {
+            return (result.IsSuccess, decimal.TryParse(result.Response, out decimal val) ? val : 0);
+        }
+
+        return (false, 0);
+    }
+
+    public async Task<(bool IsSuccess, decimal Balance)> GetAccountBalance()
+    {
+        var creditResult = await GetCredit();
+        var basePriceResult = await GetBasePrice();
+
+        return (creditResult.IsSuccess && basePriceResult.IsSuccess,
+            basePriceResult.BasePrice * creditResult.Credit);
+    }
      
+    public async Task<(bool IsSuccess, string Response,List<string>? Numbers)> GetUserNumbers()
+    {
+        var requestModel = new GetUserNumbersRequest
+        {
+            username = _options.Username,
+            password = _options.Password,
+        };
+
+        var result = await SendPostRequestAsync<GetUserNumberResponse>(Constants.Routes.GetUserNumbers, requestModel);
+
+        if (result != null)
+        {
+            return (result.MyBase.IsSuccess, 
+                result.MyBase.Response,
+                result.Data.Select(f => f.Number).ToList());
+        }
+
+        return (false, Constants.Messages.AnUnknownErrorHasOccurred, null);
+    }
+
+
     #region Helpers
-
-
-
 
     private async Task<TResponse?> SendPostRequestAsync<TResponse>(string address, object requestModel) where TResponse : class
     {
@@ -213,8 +274,6 @@ public sealed class FarapayamakService : IFarapayamakService
             return default(TResponse);
         }
     }
-
-
 
     #endregion
 

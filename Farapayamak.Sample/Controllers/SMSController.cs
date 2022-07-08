@@ -17,11 +17,12 @@ namespace Farapayamak.Sample.Controllers
         } 
 
         public async Task<IActionResult> Get()
+        
+        
         {
-            var outboxResult = await _farapayamakService.SendRangeAsync(new List<string>
-            {
-                "09127706148","0912056610","314215234"
-            },"hi nabi");
+            var bala = await _farapayamakService.GetUserNumbers();
+ 
+
             return Ok();
         }
 

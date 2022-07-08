@@ -16,8 +16,10 @@ public interface IFarapayamakService
     Task<(bool IsSuccess, string Response, List<MessageItem>? Messages)> GetOutboxMessagesAsync(string number, int index = 0);
      
     Task<(bool IsSuccess, decimal Credit)> GetCredit();
+    Task<(bool IsSuccess, decimal BasePrice)> GetBasePrice();
 
+    Task<(bool IsSuccess, decimal Balance)> GetAccountBalance();
 
-
-    List<string> GetPhoneNumbers();
+    Task<(bool IsSuccess, string Response, List<string>? Numbers)> GetUserNumbers();
+      
 }
