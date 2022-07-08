@@ -2,7 +2,7 @@
 
 public class GetDeliveriesResponse : BaseResponse
 {
-    public string Response => Value switch
+    public override string Response => Value switch
     {
         "0" => GetDeliveriesEnum.PostedToTelecommunications.ToPersian(),
         "1" => GetDeliveriesEnum.Delivered.ToPersian(),

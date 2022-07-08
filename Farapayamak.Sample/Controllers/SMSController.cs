@@ -19,9 +19,9 @@ namespace Farapayamak.Sample.Controllers
 
         public async Task<IActionResult> Get()
         {
-            var result =await _farapayamakService.SendSMSAsync("09127706148", "salam");
-            var res = await _farapayamakService.GetMessageStatusAsync(result.RecivedId);
-
+            
+            var inboxResult = await _farapayamakService.GetInboxMessagesAsync();
+            var outboxResult = await _farapayamakService.GetOutboxMessagesAsync();
             return Ok();
         }
 

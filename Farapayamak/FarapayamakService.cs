@@ -13,7 +13,6 @@ public sealed class FarapayamakService : IFarapayamakService
         _httpClient = httpClientFactory.CreateClient(Constants.HttpClientName);
     }
 
-
     public List<string> GetPhoneNumbers() => new List<string>();
 
     public async Task<(bool IsSuccess, string Response, long RecivedId)> SendSMSAsync(string toNumber, string message)
@@ -50,7 +49,6 @@ public sealed class FarapayamakService : IFarapayamakService
         return (false, Constants.Messages.AnUnknownErrorHasOccurred, -1);
     }
 
-
     public async Task<(bool IsSuccess, string Response)> GetMessageStatusAsync(long reciveId)
     {
 
@@ -71,9 +69,91 @@ public sealed class FarapayamakService : IFarapayamakService
         return (false, Constants.Messages.AnUnknownErrorHasOccurred);
     }
 
+    public async Task<(bool IsSuccess, string Response, List<MessageItem>? Messages)> GetInboxMessagesAsync(int index = 0)
+        => await GetInboxMessagesAsync(string.Empty, index); // returm all user numbers messages
+
+    public async Task<(bool IsSuccess, string Response, List<MessageItem>? Messages)> GetInboxMessagesAsync(string number, int index = 0)
+    {
+        var requestModel = new GetMessageRequest
+        {
+            password = _options.Password,
+            username = _options.Username,
+            from = number,
+            count = _options.MaxReciveMessageCount,
+            index = index,
+            location = 1 // recived
+        };
+
+        var result = await SendPostRequestAsync<GetMessageResponse>(Constants.Routes.GetMessages, requestModel);
+
+        if (result != null)
+        {
+            return (result.MyBase.IsSuccess, result.MyBase.Response, result.Data.Select(m => new MessageItem { 
+                Body = m.Body,
+                CurrentLocation = m.CurrentLocation,
+                FirstLocation  = m.FirstLocation,
+                IsUnicode = m.IsUnicode,
+                MsgID = m.MsgID,
+                Parts = m.Parts,
+                RecCount = m.RecCount,
+                Receiver = m.Receiver,
+                RecFailed = m.RecFailed,
+                RecSuccess = m.RecSuccess,
+                SendDate = m.SendDate,
+                Sender = m.Sender
+            }).ToList());
+        }
+
+        return (false, Constants.Messages.AnUnknownErrorHasOccurred, null);
+    }
+
+    public async Task<(bool IsSuccess, string Response, List<MessageItem>? Messages)> GetOutboxMessagesAsync(int index = 0)
+         => await GetOutboxMessagesAsync(string.Empty, index); // returm all user numbers messages
+
+    public async Task<(bool IsSuccess, string Response, List<MessageItem>? Messages)> GetOutboxMessagesAsync(string number, int index = 0)
+    {
+        var requestModel = new GetMessageRequest
+        {
+            password = _options.Password,
+            username = _options.Username,
+            from = number,
+            count = _options.MaxReciveMessageCount,
+            index = index,
+            location = 2 // recived
+        };
+
+        var result = await SendPostRequestAsync<GetMessageResponse>(Constants.Routes.GetMessages, requestModel);
+
+        if (result != null)
+        {
+            return (result.MyBase.IsSuccess, result.MyBase.Response, result.Data.Select(m => new MessageItem
+            {
+                Body = m.Body,
+                CurrentLocation = m.CurrentLocation,
+                FirstLocation = m.FirstLocation,
+                IsUnicode = m.IsUnicode,
+                MsgID = m.MsgID,
+                Parts = m.Parts,
+                RecCount = m.RecCount,
+                Receiver = m.Receiver,
+                RecFailed = m.RecFailed,
+                RecSuccess = m.RecSuccess,
+                SendDate = m.SendDate,
+                Sender = m.Sender
+            }).ToList());
+        }
+
+        return (false, Constants.Messages.AnUnknownErrorHasOccurred, null);
+    }
+
+
+
 
 
     #region Helpers
+
+
+
 
     private async Task<TResponse?> SendPostRequestAsync<TResponse>(string address, object requestModel) where TResponse : class
     {
@@ -91,6 +171,9 @@ public sealed class FarapayamakService : IFarapayamakService
             return default(TResponse);
         }
     }
+
+
+
     #endregion
 
 

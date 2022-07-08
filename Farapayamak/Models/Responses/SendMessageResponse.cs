@@ -2,7 +2,7 @@
 
 public class SendMessageResponse : BaseResponse
 {
-    public string Response => Value switch
+    public override string Response => Value switch
     {
         "0" => SendMessageEnum.InvalidUsernameOrPassword.ToPersian(),
         "1" => SendMessageEnum.TheRequestWasMadeSuccessfully.ToPersian(),

@@ -6,6 +6,8 @@ public class FarapayamakOptions
     public string Password { get; set; }
     public string DefaultNumber { get; set; }
     public bool UseDefaultIsFlash { get; set; } = false;
+
+    public int MaxReciveMessageCount = 50;
 }
 
 
