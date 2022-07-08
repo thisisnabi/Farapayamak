@@ -16,8 +16,8 @@ public class SendMessageResponse : BaseResponse
         _ => SendMessageEnum.TheRequestWasMadeSuccessfully.ToPersian()
     };
 
-    public long RecivedId => 
-        long.TryParse(Value, out long val) ? val : -1;
+    public long RecivedId =>
+          long.TryParse(Value, out long conVal) ? conVal == 11 ? -1 : conVal : -1;
 
 }
 

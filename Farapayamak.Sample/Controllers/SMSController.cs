@@ -14,14 +14,14 @@ namespace Farapayamak.Sample.Controllers
             _farapayamakService = farapayamakService;
 
              
-        }
-
+        } 
 
         public async Task<IActionResult> Get()
         {
-            
-            var inboxResult = await _farapayamakService.GetInboxMessagesAsync();
-            var outboxResult = await _farapayamakService.GetOutboxMessagesAsync();
+            var outboxResult = await _farapayamakService.SendRangeAsync(new List<string>
+            {
+                "09127706148","0912056610","314215234"
+            },"hi nabi");
             return Ok();
         }
 

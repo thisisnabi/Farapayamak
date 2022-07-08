@@ -15,10 +15,10 @@ public sealed class FarapayamakService : IFarapayamakService
 
     public List<string> GetPhoneNumbers() => new List<string>();
 
-    public async Task<(bool IsSuccess, string Response, long RecivedId)> SendSMSAsync(string toNumber, string message)
-        => await SendSMSAsync(_options.DefaultNumber, toNumber, message);
+    public async Task<(bool IsSuccess, string Response, long RecivedId)> SendAsync(string toNumber, string message)
+        => await SendAsync(_options.DefaultNumber, toNumber, message);
 
-    public async Task<(bool IsSuccess, string Response, long RecivedId)> SendSMSAsync(string fromNumber, string toNumber, string message)
+    public async Task<(bool IsSuccess, string Response, long RecivedId)> SendAsync(string fromNumber, string toNumber, string message)
     {
         if (string.IsNullOrEmpty(fromNumber))
             throw new ArgumentNullException(fromNumber);
@@ -48,6 +48,51 @@ public sealed class FarapayamakService : IFarapayamakService
 
         return (false, Constants.Messages.AnUnknownErrorHasOccurred, -1);
     }
+
+
+    public async Task<(bool IsSuccess, List<(string number,string response,long RecivedId)>? Status)> SendRangeAsync(List<string> toNumber, string message)
+    => await SendRangeAsync(_options.DefaultNumber, toNumber, message);
+
+    public async Task<(bool IsSuccess, List<(string number, string response, long RecivedId)>? Status)> SendRangeAsync(string fromNumber, List<string> toNumber, string message)
+    {
+        if (string.IsNullOrEmpty(fromNumber))
+            throw new ArgumentNullException(fromNumber);
+
+        if (toNumber == null || toNumber.Count == 0)
+            throw new ArgumentNullException(nameof(toNumber));
+
+        if (string.IsNullOrEmpty(message))
+            throw new ArgumentNullException(message);
+
+        var requestModel = new SendMessageRequest
+        {
+            from = fromNumber,
+            isFlash = _options.UseDefaultIsFlash,
+            password = _options.Password,
+            username = _options.Username,
+            text = message,
+            to = string.Join(",",toNumber.ToArray())
+        };
+
+        var result = await SendPostRequestAsync<SendRangeMessageResponse>(Constants.Routes.SendMessage, requestModel);
+
+        if (result != null)
+        {
+            var resultRange = result.GetRangeResponse();
+            var response = new List<(string number, string response, long RecivedId)>();
+
+            for (int i = 0; i < resultRange.Count; i++)
+            {
+                response.Add((toNumber[i],resultRange[i].Response, resultRange[i].RecivedId));
+            }
+             
+            return (result.IsSuccess, response);
+        }
+
+        return (false, null);
+    }
+
+
 
     public async Task<(bool IsSuccess, string Response)> GetMessageStatusAsync(long reciveId)
     {
@@ -146,10 +191,7 @@ public sealed class FarapayamakService : IFarapayamakService
         return (false, Constants.Messages.AnUnknownErrorHasOccurred, null);
     }
 
-
-
-
-
+     
     #region Helpers
 
 
