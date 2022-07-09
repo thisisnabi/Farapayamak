@@ -40,7 +40,7 @@ public void ConfigureServices(IServiceCollection services)
          options.Password = "lakejrf!#$RASF@";
          options.DefaultNumber = "500012701212122323"; // your number in Farapayamak Panel
          options.UseDefaultIsFlash = false; // default false
-         options.MaxReciveMessageCount = 100; // default 50, when you need get sms from panel inbox or outbox
+         options.MaxReciveMessageCount = 100; // default 50,
     });
 }
 ```
@@ -101,6 +101,34 @@ public async Task SendSingleMessage()
 }
 ```
 
+## Send Multi Message
+```csharp
+public async Task SendRangeMessage()
+{
+    List<string> recivers = new() {
+        "09127706148",
+        "09120000000",
+        "12312313452"
+    };
+
+    // use defualt panel number
+    var sendResult = await _smsService.SendRangeAsync(recivers, "Hi dear [---]");
+             
+    // use custom panel number [xxx is your panel number]
+    //var sendResult = await _smsService.SendRangeAsync("xxx", recivers, "Hi dear [---]");
+
+    // Result
+    // sendResult.IsSuccess     (bool)
+    // sendResult.Status        (list of records) List<(string number,string response,long recivedId)> 
+    // sendResult.Status.Item
+            // Item.IsSuccess     (bool)
+            // Item.Response      (string) action message
+            // Item.RecivedId     (long) if send was a failure, you get -1.
+}
+```
+
+
+
 
 ## Get/Inbox|Outbox Messages
 ```csharp
@@ -121,6 +149,7 @@ public async Task GetInboxOutBoxMessages()
            // outboxMessages.Messages      (list of MessageItemModel)
 }
 ```
+ 
 
 ## Get/ Message Status
 ```csharp
